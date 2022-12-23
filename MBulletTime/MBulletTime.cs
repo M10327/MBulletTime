@@ -35,6 +35,11 @@ namespace MBulletTime
             pls = new Dictionary<CSteamID, BulletTimeSetting>();
             meta = new Dictionary<CSteamID, PlayerMeta>();
             Instance = this;
+            foreach (var x in Provider.clients)
+            {
+                UnturnedPlayer p = UnturnedPlayer.FromSteamPlayer(x);
+                Events_OnPlayerConnected(p);
+            }
         }
 
         private void Events_OnPlayerDisconnected(UnturnedPlayer player)
