@@ -79,9 +79,11 @@ namespace MBulletTime
                     SetMovement(p, false);
                 }
             }
-            else if (p.pluginSpeedMultiplier != cfg.DefaultSpeed || p.pluginGravityMultiplier != cfg.DefaultGravity)
+            else 
             {
-                SetMovement(p, false);
+                if (pls.ContainsKey(id) && cfg.OnlyAllowOncePerJump) pls[id].Duration = 0; // this makes it so you can only do bullet time once per time in air
+                if (p.pluginSpeedMultiplier != cfg.DefaultSpeed || p.pluginGravityMultiplier != cfg.DefaultGravity)
+                    SetMovement(p, false);
             }
         }
 
