@@ -62,9 +62,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandToggleBulletTime.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="MBulletTime.cs" />
     <Compile Include="Models\BulletTimeSetting.cs" />
+    <Compile Include="Models\PlayerMeta.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

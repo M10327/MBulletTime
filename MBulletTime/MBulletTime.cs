@@ -1,5 +1,6 @@
 ﻿using MBulletTime.Models;
 using Rocket.Core.Plugins;
+using Rocket.Unturned;
 using Rocket.Unturned.Events;
 using Rocket.Unturned.Player;
 using SDG.Unturned;
@@ -16,18 +17,40 @@ namespace MBulletTime
     public class MBulletTime : RocketPlugin<Config>
     {
         public static Config cfg;
-        private static System.Timers.Timer timer;
-        private static Dictionary<CSteamID, BulletTimeSetting> pls;
+        public static System.Timers.Timer timer;
+        public static Dictionary<CSteamID, BulletTimeSetting> pls;
+        public static Dictionary<CSteamID, PlayerMeta> meta;
+        public static MBulletTime Instance;
         protected override void Load()
         {
             cfg = Configuration.Instance;
             UseableGun.OnAimingChanged_Global += UseableGun_OnAimingChanged_Global;
             UnturnedPlayerEvents.OnPlayerUpdatePosition += UnturnedPlayerEvents_OnPlayerUpdatePosition;
+            U.Events.OnPlayerConnected += Events_OnPlayerConnected;
+            U.Events.OnPlayerDisconnected += Events_OnPlayerDisconnected;
             timer = new System.Timers.Timer(10);
             timer.Elapsed += BulletTimer;
             timer.AutoReset = true;
             timer.Enabled = true;
             pls = new Dictionary<CSteamID, BulletTimeSetting>();
+            meta = new Dictionary<CSteamID, PlayerMeta>();
+            Instance = this;
+        }
+
+        private void Events_OnPlayerDisconnected(UnturnedPlayer player)
+        {
+            if (meta.ContainsKey(player.CSteamID))
+            {
+                meta.Remove(player.CSteamID);
+            }
+        }
+
+        private void Events_OnPlayerConnected(UnturnedPlayer player)
+        {
+            if (!meta.ContainsKey(player.CSteamID))
+            {
+                meta[player.CSteamID] = new PlayerMeta(cfg.DefaultOn);
+            }
         }
 
         private void UnturnedPlayerEvents_OnPlayerUpdatePosition(UnturnedPlayer player, UnityEngine.Vector3 position)
@@ -60,6 +83,7 @@ namespace MBulletTime
         {
             var p = gun.player.movement;
             var id = gun.player.channel.owner.playerID.steamID;
+            if (!meta[id].Enabled) return;
             if (p == null) return;
             if (gun.isAiming && !p.isGrounded)
             {
@@ -104,8 +128,10 @@ namespace MBulletTime
         protected override void Unload()
         {
 
-            UseableGun.OnAimingChanged_Global += UseableGun_OnAimingChanged_Global;
-            UnturnedPlayerEvents.OnPlayerUpdatePosition += UnturnedPlayerEvents_OnPlayerUpdatePosition;
+            UseableGun.OnAimingChanged_Global -= UseableGun_OnAimingChanged_Global;
+            UnturnedPlayerEvents.OnPlayerUpdatePosition -= UnturnedPlayerEvents_OnPlayerUpdatePosition;
+            U.Events.OnPlayerConnected -= Events_OnPlayerConnected;
+            U.Events.OnPlayerDisconnected -= Events_OnPlayerDisconnected;
             if (timer != null)
             {
                 timer.Stop();
