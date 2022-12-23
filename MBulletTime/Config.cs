@@ -16,6 +16,8 @@ namespace MBulletTime
         public float DefaultSpeed;
         public bool OnlyAllowOncePerJump;
         public bool DefaultOn;
+        public int DoubleJumps;
+        public float DoubleJumpStrength;
         public void LoadDefaults()
         {
             BulletTimeMS = 3000;
@@ -25,6 +27,8 @@ namespace MBulletTime
             DefaultSpeed = 1.0f;
             OnlyAllowOncePerJump = true;
             DefaultOn = false;
+            DoubleJumps = 3;
+            DoubleJumpStrength = 3;
         }
     }
 }

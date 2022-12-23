@@ -11,6 +11,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
+using UnityEngine;
+using Logger = Rocket.Core.Logging.Logger;
 
 namespace MBulletTime
 {
@@ -18,7 +20,8 @@ namespace MBulletTime
     {
         public static Config cfg;
         public static System.Timers.Timer timer;
-        public static Dictionary<CSteamID, BulletTimeSetting> pls;
+        public static Dictionary<CSteamID, BulletTimeSetting> bulletTime;
+        public static Dictionary<CSteamID, int> doubleJump;
         public static Dictionary<CSteamID, PlayerMeta> meta;
         public static MBulletTime Instance;
         protected override void Load()
@@ -28,17 +31,37 @@ namespace MBulletTime
             UnturnedPlayerEvents.OnPlayerUpdatePosition += UnturnedPlayerEvents_OnPlayerUpdatePosition;
             U.Events.OnPlayerConnected += Events_OnPlayerConnected;
             U.Events.OnPlayerDisconnected += Events_OnPlayerDisconnected;
+            PlayerInputListener.PlayerKeyInput += OnPlayerInput;
             timer = new System.Timers.Timer(10);
             timer.Elapsed += BulletTimer;
             timer.AutoReset = true;
             timer.Enabled = true;
-            pls = new Dictionary<CSteamID, BulletTimeSetting>();
+            bulletTime = new Dictionary<CSteamID, BulletTimeSetting>();
             meta = new Dictionary<CSteamID, PlayerMeta>();
+            doubleJump = new Dictionary<CSteamID, int>();
             Instance = this;
             foreach (var x in Provider.clients)
             {
                 UnturnedPlayer p = UnturnedPlayer.FromSteamPlayer(x);
-                Events_OnPlayerConnected(p);
+                SetDefaults(p);
+            }
+        }
+
+        private void OnPlayerInput(Player player, EPlayerKey key, bool down)
+        {
+            var id = player.channel.owner.playerID.steamID;
+            if (!meta[id].Enabled) return;
+            if (player.movement.isGrounded) return;
+            if (!(key == EPlayerKey.Jump && down)) return;
+            if (!doubleJump.ContainsKey(id))
+            {
+                doubleJump[id] = cfg.DoubleJumps;
+                // KNOWN ISSUE: rocket reloading prevents you from double jumping more than once
+            }
+            if (doubleJump[id] >= 1)
+            {
+                player.movement.pendingLaunchVelocity = (new Vector3(0, 1, 0)) * cfg.DoubleJumpStrength;
+                doubleJump[id]--;
             }
         }
 
@@ -52,6 +75,13 @@ namespace MBulletTime
 
         private void Events_OnPlayerConnected(UnturnedPlayer player)
         {
+            SetDefaults(player);
+            var inp = player.Player.gameObject.AddComponent<PlayerInputListener>();
+            inp.awake = true;
+        }
+
+        private void SetDefaults(UnturnedPlayer player)
+        {
             if (!meta.ContainsKey(player.CSteamID))
             {
                 meta[player.CSteamID] = new PlayerMeta(cfg.DefaultOn);
@@ -60,21 +90,27 @@ namespace MBulletTime
 
         private void UnturnedPlayerEvents_OnPlayerUpdatePosition(UnturnedPlayer player, UnityEngine.Vector3 position)
         {
-            if (pls.ContainsKey(player.CSteamID))
-                if (player.Player.movement.isGrounded)
+            if (player.Player.movement.isGrounded)
+            {
+                if (bulletTime.ContainsKey(player.CSteamID))
                 {
-                    pls.Remove(player.CSteamID);
+                    bulletTime.Remove(player.CSteamID);
                     SetMovement(player.Player.movement, false);
                 }
+                if (doubleJump.ContainsKey(player.CSteamID))
+                {
+                    doubleJump.Remove(player.CSteamID);
+                }
+            }                
         }
 
         private void BulletTimer(object sender, ElapsedEventArgs e)
         {
-            foreach (var p in pls.ToArray())
+            foreach (var p in bulletTime.ToArray())
             {
-                if (p.Value.Duration > 1)
+                if (p.Value.BulletTimeDuration > 1)
                 {
-                    pls[p.Key].Duration -= 10;
+                    bulletTime[p.Key].BulletTimeDuration -= 10;
                 }
                 else
                 {
@@ -92,11 +128,11 @@ namespace MBulletTime
             if (p == null) return;
             if (gun.isAiming && !p.isGrounded)
             {
-                if (!pls.ContainsKey(id))
+                if (!bulletTime.ContainsKey(id))
                 {
-                    pls[id] = new BulletTimeSetting() { Allowed = true, Duration = cfg.BulletTimeMS };
+                    bulletTime[id] = new BulletTimeSetting() { Allowed = true, BulletTimeDuration = cfg.BulletTimeMS };
                 }
-                if (pls[id].Duration > 0)
+                if (bulletTime[id].BulletTimeDuration > 0)
                 {
                     if (p.pluginSpeedMultiplier == cfg.DefaultSpeed && p.pluginGravityMultiplier == cfg.DefaultGravity)
                     {
@@ -110,7 +146,7 @@ namespace MBulletTime
             }
             else 
             {
-                if (pls.ContainsKey(id) && cfg.OnlyAllowOncePerJump) pls[id].Duration = 0; // this makes it so you can only do bullet time once per time in air
+                if (bulletTime.ContainsKey(id) && cfg.OnlyAllowOncePerJump) bulletTime[id].BulletTimeDuration = 0; // this makes it so you can only do bullet time once per time in air
                 if (p.pluginSpeedMultiplier != cfg.DefaultSpeed || p.pluginGravityMultiplier != cfg.DefaultGravity)
                     SetMovement(p, false);
             }

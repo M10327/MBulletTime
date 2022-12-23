@@ -67,6 +67,7 @@
     <Compile Include="MBulletTime.cs" />
     <Compile Include="Models\BulletTimeSetting.cs" />
     <Compile Include="Models\PlayerMeta.cs" />
+    <Compile Include="PlayerInputListener.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

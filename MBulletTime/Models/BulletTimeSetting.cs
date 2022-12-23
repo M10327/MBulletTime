@@ -9,6 +9,6 @@ namespace MBulletTime.Models
     public class BulletTimeSetting
     {
         public bool Allowed;
-        public int Duration;
+        public int BulletTimeDuration;
     }
 }
