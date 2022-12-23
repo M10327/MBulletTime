@@ -56,7 +56,6 @@ namespace MBulletTime
             if (!doubleJump.ContainsKey(id))
             {
                 doubleJump[id] = cfg.MidAirJumps;
-                // KNOWN ISSUE: rocket reloading prevents you from double jumping more than once
             }
             if (doubleJump[id] < 1) return;
             var offset = new Vector3(0, 0, 0);
@@ -182,6 +181,7 @@ namespace MBulletTime
             UnturnedPlayerEvents.OnPlayerUpdatePosition -= UnturnedPlayerEvents_OnPlayerUpdatePosition;
             U.Events.OnPlayerConnected -= Events_OnPlayerConnected;
             U.Events.OnPlayerDisconnected -= Events_OnPlayerDisconnected;
+            PlayerInputListener.PlayerKeyInput -= OnPlayerInput;
             if (timer != null)
             {
                 timer.Stop();
