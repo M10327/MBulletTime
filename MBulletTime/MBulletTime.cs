@@ -52,15 +52,24 @@ namespace MBulletTime
             var id = player.channel.owner.playerID.steamID;
             if (!meta[id].Enabled) return;
             if (player.movement.isGrounded) return;
-            if (!(key == EPlayerKey.Jump && down)) return;
+            if (!((key == EPlayerKey.Jump || key == EPlayerKey.HotKey1) && down)) return;
             if (!doubleJump.ContainsKey(id))
             {
-                doubleJump[id] = cfg.DoubleJumps;
+                doubleJump[id] = cfg.MidAirJumps;
                 // KNOWN ISSUE: rocket reloading prevents you from double jumping more than once
             }
-            if (doubleJump[id] >= 1)
+            if (doubleJump[id] < 1) return;
+            var offset = new Vector3(0, 0, 0);
+            if (player.movement.fall < 0) offset.y = Math.Abs(player.movement.fall);
+            if (key == EPlayerKey.Jump)
             {
-                player.movement.pendingLaunchVelocity = (new Vector3(0, 1, 0)) * cfg.DoubleJumpStrength;
+                player.movement.pendingLaunchVelocity = ((new Vector3(0, 1, 0)) * cfg.DoubleJumpStrength) + offset;
+                doubleJump[id]--;
+            }
+            else if (key == EPlayerKey.HotKey1)
+            {
+                var launch = (player.look.aim.forward * cfg.DoubleJumpStrength) + offset;
+                player.movement.pendingLaunchVelocity = launch;
                 doubleJump[id]--;
             }
         }
