@@ -24,7 +24,7 @@ namespace MBulletTime
             DefaultGravity = 1.0f;
             DefaultSpeed = 1.0f;
             OnlyAllowOncePerJump = true;
-            DefaultOn = true;
+            DefaultOn = false;
         }
     }
 }
