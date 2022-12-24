@@ -16,21 +16,23 @@ namespace MBulletTime
         public float DefaultSpeed;
         public bool OnlyAllowOncePerJump;
         public bool DefaultOn;
-        public int MidAirJumps;
+        public int DoubleJumps;
         public float DoubleJumpStrength;
-        public float BulletJumpStrength;
+        public int Dashes;
+        public float DashStrength;
         public void LoadDefaults()
         {
-            BulletTimeMS = 3000;
-            Gravity = 0.1f;
-            Speed = 0.1f;
-            DefaultGravity = 1.0f;
-            DefaultSpeed = 1.0f;
-            OnlyAllowOncePerJump = true;
+            BulletTimeMS = 2000;
+            Gravity = 0.2f;
+            Speed = 0.2f;
+            DefaultGravity = 1.1f;
+            DefaultSpeed = 1.1f;
+            OnlyAllowOncePerJump = false;
             DefaultOn = false;
-            MidAirJumps = 3;
-            DoubleJumpStrength = 20;
-            BulletJumpStrength = 20;
+            DoubleJumps = 2;
+            DoubleJumpStrength = 13;
+            Dashes = 1;
+            DashStrength = 18;
         }
     }
 }

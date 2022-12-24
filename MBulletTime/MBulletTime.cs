@@ -22,6 +22,7 @@ namespace MBulletTime
         public static System.Timers.Timer timer;
         public static Dictionary<CSteamID, BulletTimeSetting> bulletTime;
         public static Dictionary<CSteamID, int> doubleJump;
+        public static Dictionary<CSteamID, int> dashes;
         public static Dictionary<CSteamID, PlayerMeta> meta;
         public static MBulletTime Instance;
         protected override void Load()
@@ -39,6 +40,7 @@ namespace MBulletTime
             bulletTime = new Dictionary<CSteamID, BulletTimeSetting>();
             meta = new Dictionary<CSteamID, PlayerMeta>();
             doubleJump = new Dictionary<CSteamID, int>();
+            dashes = new Dictionary<CSteamID, int>();
             Instance = this;
             foreach (var x in Provider.clients)
             {
@@ -55,21 +57,24 @@ namespace MBulletTime
             if (!((key == EPlayerKey.Jump || key == EPlayerKey.HotKey1) && down)) return;
             if (!doubleJump.ContainsKey(id))
             {
-                doubleJump[id] = cfg.MidAirJumps;
+                doubleJump[id] = cfg.DoubleJumps;
             }
-            if (doubleJump[id] < 1) return;
+            if (!dashes.ContainsKey(id))
+            {
+                dashes[id] = cfg.Dashes;
+            }
             var offset = new Vector3(0, 0, 0);
             if (player.movement.fall < 0) offset.y = Math.Abs(player.movement.fall);
-            if (key == EPlayerKey.Jump)
+            if (key == EPlayerKey.Jump && doubleJump[id] > 0)
             {
                 player.movement.pendingLaunchVelocity = ((new Vector3(0, 1, 0)) * cfg.DoubleJumpStrength) + offset;
                 doubleJump[id]--;
             }
-            else if (key == EPlayerKey.HotKey1)
+            else if (key == EPlayerKey.HotKey1 && dashes[id] > 0)
             {
                 var launch = (player.look.aim.forward * cfg.DoubleJumpStrength) + offset;
                 player.movement.pendingLaunchVelocity = launch;
-                doubleJump[id]--;
+                dashes[id]--;
             }
         }
 
@@ -108,6 +113,10 @@ namespace MBulletTime
                 if (doubleJump.ContainsKey(player.CSteamID))
                 {
                     doubleJump.Remove(player.CSteamID);
+                }
+                if (dashes.ContainsKey(player.CSteamID))
+                {
+                    dashes.Remove(player.CSteamID);
                 }
             }                
         }
