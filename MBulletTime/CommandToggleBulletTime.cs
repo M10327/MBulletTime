@@ -13,11 +13,11 @@ namespace MBulletTime
     {
         public AllowedCaller AllowedCaller => AllowedCaller.Player;
 
-        public string Name => "BulletTime";
+        public string Name => "Parkour";
 
-        public string Help => "Toggled whether you can activate bullet time";
+        public string Help => "manage parkour settings";
 
-        public string Syntax => "none";
+        public string Syntax => "/parkour <toggle/dash>";
 
         public List<string> Aliases => new List<string>();
 
@@ -26,15 +26,39 @@ namespace MBulletTime
         public void Execute(IRocketPlayer caller, string[] command)
         {
             var id = (caller as UnturnedPlayer).CSteamID;
-            if (MBulletTime.meta[id].Enabled)
+            if (command.Length < 1)
             {
-                MBulletTime.meta[id].Enabled = false;
-                UnturnedChat.Say(caller, "Turned bullet time off");
+                UnturnedChat.Say(caller, Syntax);
+                return;
             }
-            else
+            if (command[0].ToLower() == "toggle")
             {
-                MBulletTime.meta[id].Enabled = true;
-                UnturnedChat.Say(caller, "Turned bullet time on");
+                if (MBulletTime.meta[id].Enabled)
+                {
+                    MBulletTime.meta[id].Enabled = false;
+                    UnturnedChat.Say(caller, "Turned parkour features off");
+                }
+                else
+                {
+                    MBulletTime.meta[id].Enabled = true;
+                    UnturnedChat.Say(caller, "Turned parkour features on");
+                }
+
+            }
+            if (command[0].ToLower() == "dash")
+            {
+                if (command.Length < 2)
+                {
+                    UnturnedChat.Say(caller, "/parkour dash <1-5> to set the plugin hotkey");
+                    return;
+                }
+                if (!int.TryParse(command[1], out int key) || key < 1 || key > 5){
+                    UnturnedChat.Say(caller, "/parkour dash <1-5> to set the plugin hotkey");
+                    return;
+                }
+                key += 9;
+                MBulletTime.meta[id].DashKeyBind = (EPlayerKey)key;
+                UnturnedChat.Say(caller, $"Set your dash hotkey to {MBulletTime.meta[id].DashKeyBind}");
             }
         }
     }

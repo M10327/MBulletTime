@@ -9,10 +9,12 @@ namespace MBulletTime.Models
     public class PlayerMeta
     {
         public bool Enabled;
+        public EPlayerKey DashKeyBind;
 
-        public PlayerMeta(bool enabled)
+        public PlayerMeta(bool enabled, EPlayerKey keybind = EPlayerKey.HotKey1)
         {
             Enabled = enabled;
+            DashKeyBind = keybind;
         }
     }
 }

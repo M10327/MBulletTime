@@ -54,7 +54,7 @@ namespace MBulletTime
             var id = player.channel.owner.playerID.steamID;
             if (!meta[id].Enabled) return;
             if (player.movement.isGrounded) return;
-            if (!((key == EPlayerKey.Jump || key == EPlayerKey.HotKey1) && down)) return;
+            if (!((key == EPlayerKey.Jump || ((int)key >= 10 || (int)key <= 14)) && down)) return;
             if (!doubleJump.ContainsKey(id))
             {
                 doubleJump[id] = cfg.DoubleJumps;
@@ -70,9 +70,11 @@ namespace MBulletTime
                 player.movement.pendingLaunchVelocity = ((new Vector3(0, 1, 0)) * cfg.DoubleJumpStrength) + offset;
                 doubleJump[id]--;
             }
-            else if (key == EPlayerKey.HotKey1 && dashes[id] > 0)
+            else if (key == meta[id].DashKeyBind && dashes[id] > 0)
             {
-                var launch = (player.look.aim.forward * cfg.DoubleJumpStrength) + offset;
+                var direction = player.look.aim.rotation.normalized * player.movement.move;
+                var launch = (Vector3.Normalize(direction) * cfg.DashStrength) + offset;
+                
                 player.movement.pendingLaunchVelocity = launch;
                 dashes[id]--;
             }
@@ -97,7 +99,7 @@ namespace MBulletTime
         {
             if (!meta.ContainsKey(player.CSteamID))
             {
-                meta[player.CSteamID] = new PlayerMeta(cfg.DefaultOn);
+                meta[player.CSteamID] = new PlayerMeta(cfg.DefaultOn, EPlayerKey.HotKey1);
             }
         }
 
