@@ -113,7 +113,7 @@ namespace MBulletTime
         {
             if (!meta.ContainsKey(player.CSteamID))
             {
-                meta[player.CSteamID] = new PlayerMeta(cfg.DefaultOn, EPlayerKey.HotKey1);
+                meta[player.CSteamID] = new PlayerMeta(cfg.DefaultOn, (EPlayerKey)(cfg.DashDefaultKey + 9));
             }
         }
 
