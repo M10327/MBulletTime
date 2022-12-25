@@ -163,13 +163,14 @@ namespace MBulletTime
             {
                 if (!bulletTime.ContainsKey(id))
                 {
-                    bulletTime[id] = new BulletTimeSetting() { Allowed = true, BulletTimeDuration = cfg.BulletTimeMS };
+                    bulletTime[id] = new BulletTimeSetting() { Allowed = true, BulletTimeDuration = cfg.GlideMS };
                 }
                 if (bulletTime[id].BulletTimeDuration > 0)
                 {
                     if (p.pluginSpeedMultiplier == cfg.DefaultSpeed && p.pluginGravityMultiplier == cfg.DefaultGravity)
                     {
                         SetMovement(p, true);
+                        PlayEffect(gun.player.transform.position, cfg.GlideEffect, 1);
                     }
                 }
                 else
@@ -179,7 +180,7 @@ namespace MBulletTime
             }
             else 
             {
-                if (bulletTime.ContainsKey(id) && cfg.OnlyAllowOncePerJump) bulletTime[id].BulletTimeDuration = 0; // this makes it so you can only do bullet time once per time in air
+                if (bulletTime.ContainsKey(id) && cfg.GlideOncePerJump) bulletTime[id].BulletTimeDuration = 0; // this makes it so you can only do bullet time once per time in air
                 if (p.pluginSpeedMultiplier != cfg.DefaultSpeed || p.pluginGravityMultiplier != cfg.DefaultGravity)
                     SetMovement(p, false);
             }

@@ -9,12 +9,13 @@ namespace MBulletTime
 {
     public class Config : IRocketPluginConfiguration
     {
-        public int BulletTimeMS;
+        public int GlideMS;
         public float Gravity;
         public float Speed;
         public float DefaultGravity;
         public float DefaultSpeed;
-        public bool OnlyAllowOncePerJump;
+        public bool GlideOncePerJump;
+        public ushort GlideEffect;
         public bool DefaultOn;
         public int DoubleJumps;
         public float DoubleJumpStrength;
@@ -24,12 +25,12 @@ namespace MBulletTime
         public ushort DashEffect;
         public void LoadDefaults()
         {
-            BulletTimeMS = 2000;
+            GlideMS = 2000;
             Gravity = 0.2f;
             Speed = 0.2f;
             DefaultGravity = 1.1f;
             DefaultSpeed = 1.1f;
-            OnlyAllowOncePerJump = false;
+            GlideOncePerJump = false;
             DefaultOn = false;
             DoubleJumps = 2;
             DoubleJumpStrength = 13;
@@ -37,6 +38,7 @@ namespace MBulletTime
             Dashes = 1;
             DashStrength = 18;
             DashEffect = 1978;
+            GlideEffect = 1979;
         }
     }
 }
