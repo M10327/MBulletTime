@@ -18,8 +18,10 @@ namespace MBulletTime
         public bool DefaultOn;
         public int DoubleJumps;
         public float DoubleJumpStrength;
+        public ushort DoubleJumpEffect;
         public int Dashes;
         public float DashStrength;
+        public ushort DashEffect;
         public void LoadDefaults()
         {
             BulletTimeMS = 2000;
@@ -31,8 +33,10 @@ namespace MBulletTime
             DefaultOn = false;
             DoubleJumps = 2;
             DoubleJumpStrength = 13;
+            DoubleJumpEffect = 1977;
             Dashes = 1;
             DashStrength = 18;
+            DashEffect = 1978;
         }
     }
 }

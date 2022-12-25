@@ -69,6 +69,7 @@ namespace MBulletTime
             {
                 player.movement.pendingLaunchVelocity = ((new Vector3(0, 1, 0)) * cfg.DoubleJumpStrength) + offset;
                 doubleJump[id]--;
+                PlayEffect(player.transform.position, cfg.DoubleJumpEffect, 50);
             }
             else if (key == meta[id].DashKeyBind && dashes[id] > 0)
             {
@@ -77,7 +78,20 @@ namespace MBulletTime
                 
                 player.movement.pendingLaunchVelocity = launch;
                 dashes[id]--;
+                PlayEffect(player.transform.position, cfg.DashEffect, 50);
             }
+        }
+
+        private void PlayEffect(Vector3 positon, ushort id, float range)
+        {
+            if (id == 0) return;
+            var asset = Assets.find(EAssetType.EFFECT, id);
+            var eff = new TriggerEffectParameters((EffectAsset)asset)
+            {
+                relevantDistance = range,
+                position = positon
+            };
+            EffectManager.triggerEffect(eff);
         }
 
         private void Events_OnPlayerDisconnected(UnturnedPlayer player)
