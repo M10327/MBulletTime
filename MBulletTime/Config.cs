@@ -24,6 +24,7 @@ namespace MBulletTime
         public float DashStrength;
         public ushort DashEffect;
         public int DashDefaultKey;
+        public float DashVerticalBoost;
         public void LoadDefaults()
         {
             GlideMS = 2000;
@@ -36,11 +37,12 @@ namespace MBulletTime
             DoubleJumps = 2;
             DoubleJumpStrength = 13;
             DoubleJumpEffect = 1977;
-            Dashes = 1;
-            DashStrength = 18;
+            Dashes = 2;
+            DashStrength = 15;
             DashEffect = 1978;
             GlideEffect = 1979;
             DashDefaultKey = 1;
+            DashVerticalBoost = 3;
         }
     }
 }

@@ -76,6 +76,7 @@ namespace MBulletTime
                 if (player.movement.move.magnitude == 0) return;
                 var direction = player.look.aim.rotation.normalized * player.movement.move;
                 var launch = (Vector3.Normalize(direction) * cfg.DashStrength) + offset;
+                launch.y += cfg.DashVerticalBoost;
                 player.movement.pendingLaunchVelocity = launch;
                 dashes[id]--;
                 PlayEffect(player.transform.position, cfg.DashEffect, 50);
