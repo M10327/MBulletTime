@@ -8,6 +8,7 @@ using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
@@ -78,14 +79,22 @@ namespace MBulletTime
                 }
                 if (dashes[id] < 1) return;
                 var offset = new Vector3(0, 0, 0);
+                var velocity = (Vector3)typeof(PlayerMovement).GetField("velocity", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(player.movement);
                 if (player.movement.fall < 0) offset.y = Math.Abs(player.movement.fall);
                 var direction = player.look.aim.rotation.normalized * player.movement.move;
+                if (!SameSign(direction.x, velocity.x)) offset.x = velocity.x * -1;
+                if (!SameSign(direction.z, velocity.z)) offset.z = velocity.z * -1;
                 var launch = (Vector3.Normalize(direction) * cfg.DashStrength) + offset;
                 launch.y += cfg.DashVerticalBoost;
                 player.movement.pendingLaunchVelocity = launch;
                 dashes[id]--;
                 PlayEffect(player.transform.position, cfg.DashEffect, 50);
             }
+        }
+
+        private bool SameSign (float num1, float num2)
+        {
+            return ((num1 < 0) == (num2 < 0));
         }
 
         private void PlayEffect(Vector3 positon, ushort id, float range)
