@@ -53,27 +53,32 @@ namespace MBulletTime
         {
             var id = player.channel.owner.playerID.steamID;
             if (!meta[id].Enabled) return;
-            if (player.movement.isGrounded) return;
-            if (!((key == EPlayerKey.Jump || ((int)key >= 10 || (int)key <= 14)) && down)) return;
-            if (!doubleJump.ContainsKey(id))
+            if (!down) return;
+            if (key == EPlayerKey.Jump)
             {
-                doubleJump[id] = cfg.DoubleJumps;
-            }
-            if (!dashes.ContainsKey(id))
-            {
-                dashes[id] = cfg.Dashes;
-            }
-            var offset = new Vector3(0, 0, 0);
-            if (player.movement.fall < 0) offset.y = Math.Abs(player.movement.fall);
-            if (key == EPlayerKey.Jump && doubleJump[id] > 0)
-            {
+                if (player.movement.isGrounded) return;
+                if (!doubleJump.ContainsKey(id))
+                {
+                    doubleJump[id] = cfg.DoubleJumps;
+                }
+                if (doubleJump[id] < 1) return;
+                var offset = new Vector3(0, 0, 0);
+                if (player.movement.fall < 0) offset.y = Math.Abs(player.movement.fall);
                 player.movement.pendingLaunchVelocity = ((new Vector3(0, 1, 0)) * cfg.DoubleJumpStrength) + offset;
                 doubleJump[id]--;
                 PlayEffect(player.transform.position, cfg.DoubleJumpEffect, 50);
             }
-            else if (key == meta[id].DashKeyBind && dashes[id] > 0)
+            else if (key == meta[id].DashKeyBind)
             {
                 if (player.movement.move.magnitude == 0) return;
+                if (!cfg.DashAllowFromGround && player.movement.isGrounded) return;
+                if (!dashes.ContainsKey(id))
+                {
+                    dashes[id] = cfg.Dashes;
+                }
+                if (dashes[id] < 1) return;
+                var offset = new Vector3(0, 0, 0);
+                if (player.movement.fall < 0) offset.y = Math.Abs(player.movement.fall);
                 var direction = player.look.aim.rotation.normalized * player.movement.move;
                 var launch = (Vector3.Normalize(direction) * cfg.DashStrength) + offset;
                 launch.y += cfg.DashVerticalBoost;

@@ -25,6 +25,7 @@ namespace MBulletTime
         public ushort DashEffect;
         public int DashDefaultKey;
         public float DashVerticalBoost;
+        public bool DashAllowFromGround;
         public void LoadDefaults()
         {
             GlideMS = 2000;
@@ -43,6 +44,7 @@ namespace MBulletTime
             GlideEffect = 1979;
             DashDefaultKey = 1;
             DashVerticalBoost = 3;
+            DashAllowFromGround = true;
         }
     }
 }
