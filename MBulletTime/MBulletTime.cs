@@ -140,8 +140,8 @@ namespace MBulletTime
             {
                 meta.Remove(player.CSteamID);
             }
-            player.Player.equipment.onDequipRequested -= (PlayerEquipment equipment, ref bool shouldAllow) => OnDeEquip(player, equipment, shouldAllow);
-            player.Player.equipment.onEquipRequested -= (PlayerEquipment equipment, ItemJar jar, ItemAsset asset, ref bool shouldAllow) => OnEquip(player, equipment, jar, asset, shouldAllow);
+            player.Player.equipment.onDequipRequested -= (PlayerEquipment equipment, ref bool shouldAllow) => SetMovement(player.Player.movement, false);
+            player.Player.equipment.onEquipRequested -= (PlayerEquipment equipment, ItemJar jar, ItemAsset asset, ref bool shouldAllow) => SetMovement(player.Player.movement, false);
         }
 
         private void Events_OnPlayerConnected(UnturnedPlayer player)
@@ -149,18 +149,8 @@ namespace MBulletTime
             SetDefaults(player);
             var inp = player.Player.gameObject.AddComponent<PlayerInputListener>();
             inp.awake = true;
-            player.Player.equipment.onDequipRequested += (PlayerEquipment equipment, ref bool shouldAllow) => OnDeEquip(player, equipment, shouldAllow);
-            player.Player.equipment.onEquipRequested += (PlayerEquipment equipment, ItemJar jar, ItemAsset asset, ref bool shouldAllow) => OnEquip(player, equipment, jar, asset, shouldAllow);
-        }
-
-        private void OnEquip(UnturnedPlayer player, PlayerEquipment equipment, ItemJar jar, ItemAsset asset, bool shouldAllow)
-        {
-            SetMovement(player.Player.movement, false);
-        }
-
-        private void OnDeEquip(UnturnedPlayer player, PlayerEquipment equipment, bool shouldAllow)
-        {
-            SetMovement(player.Player.movement, false);
+            player.Player.equipment.onDequipRequested += (PlayerEquipment equipment, ref bool shouldAllow) => SetMovement(player.Player.movement, false);
+            player.Player.equipment.onEquipRequested += (PlayerEquipment equipment, ItemJar jar, ItemAsset asset, ref bool shouldAllow) => SetMovement(player.Player.movement, false);
         }
 
         private void SetDefaults(UnturnedPlayer player)
