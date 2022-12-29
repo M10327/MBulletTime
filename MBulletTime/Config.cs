@@ -38,13 +38,13 @@ namespace MBulletTime
             DoubleJumps = 2;
             DoubleJumpStrength = 13;
             DoubleJumpEffect = 1977;
-            Dashes = 2;
-            DashStrength = 15;
+            Dashes = 1;
+            DashStrength = 13;
             DashEffect = 1978;
-            GlideEffect = 1979;
-            DashDefaultKey = 1;
-            DashVerticalBoost = 3;
-            DashAllowFromGround = true;
+            GlideEffect = 0;
+            DashDefaultKey = 3;
+            DashVerticalBoost = 6;
+            DashAllowFromGround = false;
         }
     }
 }

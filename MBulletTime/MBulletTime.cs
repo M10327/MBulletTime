@@ -115,6 +115,8 @@ namespace MBulletTime
             {
                 meta.Remove(player.CSteamID);
             }
+            player.Player.equipment.onDequipRequested -= (PlayerEquipment equipment, ref bool shouldAllow) => OnDeEquip(player, equipment, shouldAllow);
+            player.Player.equipment.onEquipRequested -= (PlayerEquipment equipment, ItemJar jar, ItemAsset asset, ref bool shouldAllow) => OnEquip(player, equipment, jar, asset, shouldAllow);
         }
 
         private void Events_OnPlayerConnected(UnturnedPlayer player)
@@ -122,6 +124,18 @@ namespace MBulletTime
             SetDefaults(player);
             var inp = player.Player.gameObject.AddComponent<PlayerInputListener>();
             inp.awake = true;
+            player.Player.equipment.onDequipRequested += (PlayerEquipment equipment, ref bool shouldAllow) => OnDeEquip(player, equipment, shouldAllow);
+            player.Player.equipment.onEquipRequested += (PlayerEquipment equipment, ItemJar jar, ItemAsset asset, ref bool shouldAllow) => OnEquip(player, equipment, jar, asset, shouldAllow);
+        }
+
+        private void OnEquip(UnturnedPlayer player, PlayerEquipment equipment, ItemJar jar, ItemAsset asset, bool shouldAllow)
+        {
+            SetMovement(player.Player.movement, false);
+        }
+
+        private void OnDeEquip(UnturnedPlayer player, PlayerEquipment equipment, bool shouldAllow)
+        {
+            SetMovement(player.Player.movement, false);
         }
 
         private void SetDefaults(UnturnedPlayer player)
@@ -196,8 +210,7 @@ namespace MBulletTime
             else 
             {
                 if (bulletTime.ContainsKey(id) && cfg.GlideOncePerJump) bulletTime[id].BulletTimeDuration = 0; // this makes it so you can only do bullet time once per time in air
-                if (p.pluginSpeedMultiplier != cfg.DefaultSpeed || p.pluginGravityMultiplier != cfg.DefaultGravity)
-                    SetMovement(p, false);
+                SetMovement(p, false);
             }
         }
 
@@ -208,7 +221,7 @@ namespace MBulletTime
                 p.sendPluginGravityMultiplier(cfg.Gravity);
                 p.sendPluginSpeedMultiplier(cfg.Speed);
             }
-            else
+            else if (p.pluginSpeedMultiplier != cfg.DefaultSpeed || p.pluginGravityMultiplier != cfg.DefaultGravity)
             {
                 p.sendPluginGravityMultiplier(cfg.DefaultGravity);
                 p.sendPluginSpeedMultiplier(cfg.DefaultSpeed);
