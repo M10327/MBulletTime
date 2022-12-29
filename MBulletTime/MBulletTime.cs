@@ -21,6 +21,7 @@ namespace MBulletTime
     {
         public static Config cfg;
         public static System.Timers.Timer timer;
+        public static System.Timers.Timer CooldownManager;
         public static Dictionary<CSteamID, BulletTimeSetting> bulletTime;
         public static Dictionary<CSteamID, int> doubleJump;
         public static Dictionary<CSteamID, int> dashes;
@@ -38,6 +39,10 @@ namespace MBulletTime
             timer.Elapsed += BulletTimer;
             timer.AutoReset = true;
             timer.Enabled = true;
+            CooldownManager = new System.Timers.Timer(10);
+            CooldownManager.Elapsed += Cooldowns;
+            CooldownManager.AutoReset = true;
+            CooldownManager.Enabled = true;
             bulletTime = new Dictionary<CSteamID, BulletTimeSetting>();
             meta = new Dictionary<CSteamID, PlayerMeta>();
             doubleJump = new Dictionary<CSteamID, int>();
@@ -50,6 +55,22 @@ namespace MBulletTime
             }
         }
 
+        private void Cooldowns(object sender, ElapsedEventArgs e)
+        {
+            foreach (var x in Provider.clients)
+            {
+                var id = x.playerID.steamID;
+                if (meta[id].Cooldown.Dash > 0)
+                {
+                    meta[id].Cooldown.Dash -= 10;
+                }
+                if (meta[id].Cooldown.DoubleJump > 0)
+                {
+                    meta[id].Cooldown.DoubleJump -= 10;
+                }
+            }
+        }
+
         private void OnPlayerInput(Player player, EPlayerKey key, bool down)
         {
             var id = player.channel.owner.playerID.steamID;
@@ -57,6 +78,7 @@ namespace MBulletTime
             if (!down) return;
             if (key == EPlayerKey.Jump)
             {
+                if (meta[id].Cooldown.DoubleJump > 0) return;
                 if (player.movement.isGrounded) return;
                 if (!doubleJump.ContainsKey(id))
                 {
@@ -67,10 +89,12 @@ namespace MBulletTime
                 if (player.movement.fall < 0) offset.y = Math.Abs(player.movement.fall);
                 player.movement.pendingLaunchVelocity = ((new Vector3(0, 1, 0)) * cfg.DoubleJumpStrength) + offset;
                 doubleJump[id]--;
+                meta[id].Cooldown.DoubleJump = cfg.DoubleJumpCooldownMS;
                 PlayEffect(player.transform.position, cfg.DoubleJumpEffect, 50);
             }
             else if (key == meta[id].DashKeyBind)
             {
+                if (meta[id].Cooldown.Dash > 0) return;
                 if (player.movement.move.magnitude == 0) return;
                 if (!cfg.DashAllowFromGround && player.movement.isGrounded) return;
                 if (!dashes.ContainsKey(id))
@@ -88,6 +112,7 @@ namespace MBulletTime
                 launch.y += cfg.DashVerticalBoost;
                 player.movement.pendingLaunchVelocity = launch;
                 dashes[id]--;
+                meta[id].Cooldown.Dash = cfg.DashCooldownMS;
                 PlayEffect(player.transform.position, cfg.DashEffect, 50);
             }
         }
@@ -240,6 +265,11 @@ namespace MBulletTime
             {
                 timer.Stop();
                 timer.Elapsed -= BulletTimer;
+            }
+            if (CooldownManager != null)
+            {
+                CooldownManager.Stop();
+                CooldownManager.Elapsed -= BulletTimer;
             }
         }
     }
