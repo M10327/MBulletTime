@@ -231,6 +231,7 @@ namespace MBulletTime
 
         private void SetMovement(PlayerMovement p, bool on)
         {
+            if (!meta[p.player.channel.owner.playerID.steamID].Enabled) return;
             if (on)
             {
                 p.sendPluginGravityMultiplier(cfg.Gravity);

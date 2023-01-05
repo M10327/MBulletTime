@@ -31,6 +31,14 @@ namespace MBulletTime
                 UnturnedChat.Say(caller, Syntax);
                 return;
             }
+            if (MBulletTime.bulletTime.ContainsKey(id))
+            {
+                if (MBulletTime.bulletTime[id].BulletTimeDuration > 0)
+                {
+                    UnturnedChat.Say(caller, "Cannot use this command while in bullet time");
+                    return;
+                }
+            }
             if (command[0].ToLower() == "toggle")
             {
                 if (MBulletTime.meta[id].Enabled)
